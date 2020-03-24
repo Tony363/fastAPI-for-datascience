@@ -18,15 +18,63 @@ import sys
 import struct
 
 from fastapi import FastAPI, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel
+from typing import Optional
+
 from sklearn.model_selection import train_test_split
 
+
+fake_users_db = {
+    "johndoe":{
+        'username':'johndoe',
+        'full_name':'John Doe',
+        'email':'johndoe@example.com',
+        'hashed_password':'fakehashedsecret',
+        'disabled':False,
+    },
+    "alice":{
+        'username':'alice',
+        'full_name':'Alice Wonderson',
+        'email':'alice@example.com',
+        'hashed_password':'fakehashedsecret2',
+        'disabled':True
+    },
+}
+
 app = FastAPI()
-oauth_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+
+class User(BaseModel):
+    username: str
+    email: Optional[str] = None 
+    full_name: Optional[str] = None 
+    disabled: Optional[bool] = None 
+
+
+
+def fake_decode_token(token):
+    return User(
+        username=token + "fakedecoded", email="sample@example.com", full_name="John Doe"
+    )
+
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    user = fake_decode_token(token)
+    return user
+
+@app.get("/users/me")
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    used = []
+    digit = random.choice(range(1000,100000))#sys.maxsize
+    if digit not in used:
+        used.append(digit)
+        return {"message": digit}
+    elif digit in used:
+        return {"message":'this is a used digit'}
 
 @app.get("/prediction/{stock_id}")
 async def predict(stock_id):
@@ -53,7 +101,7 @@ async def predict(stock_id):
     return {"prediction":prediction}
 
 @app.get("/TONY's/stock/{stock_id}")
-async def read_item(stock_id):#token: str= Depends(oauth_scheme),stock_id):
+async def read_items(stock_id,token: str = Depends(oauth2_scheme)):
     stock = yf.Ticker(str(stock_id))
     stock_info = stock.info
     history = stock.history(period='max').to_dict()
@@ -88,10 +136,21 @@ async def server_socket():
     return {'server':'connected'}
 
 
+@app.get("/socket/game_client/")
+async def main():
+    """ Main method """    
+    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window.setup()
+    arcade.run()
+    table = window.get_table()
+  
+    return window.get_table()
 
 
 
-
+"""
+My Game Portion
+"""
 SCREEN_WIDTH = 1400
 SCREEN_HEIGHT = 1000
 
@@ -369,16 +428,6 @@ class MyGame(arcade.Window):
         except socket.timeout:
             print('REQUEST TIMED OUT')
 
-
-@app.get("/socket/game_client/")
-async def main():
-    """ Main method """    
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    window.setup()
-    arcade.run()
-    table = window.get_table()
-  
-    return window.get_table()
 
 
 
