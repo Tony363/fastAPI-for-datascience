@@ -115,7 +115,7 @@ async def root():
         return {"message":'this is a used digit'}
 
 @app.post("/prediction/{stock_id}")
-async def predict(stock_id):
+async def predict(stock_id,token: str = Depends(oauth2_scheme)):
     loaded_model = xgb.Booster()
     loaded_model.load_model('xgbregression.model')
     stock = yf.Ticker(str(stock_id))
