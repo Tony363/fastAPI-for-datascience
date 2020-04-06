@@ -88,15 +88,15 @@ def authenticate_user(fake_db,username:str,password:str):
         return False
     return user
 
-def create_access_token(*,data:dict,expires_delta:timedelta=None):
-    to_encode = data.copy()
-    if expires_delta:
-        expires = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({'exp':expire})
-    encoded_jwt = jwt.encode((to_encode, SECRET_KEY,algorithm=ALGORITHM)
-    return encoded_jwt
+# def create_access_token(*,data:dict,expires_delta:timedelta=None):
+#     to_encode = data.copy()
+#     if expires_delta:
+#         expires = datetime.utcnow() + expires_delta
+#     else:
+#         expire = datetime.utcnow() + timedelta(minutes=15)
+#     to_encode.update({'exp':expire})
+#     encoded_jwt = jwt.encode((to_encode, SECRET_KEY,algorithm=ALGORITHM))
+#     return encoded_jwt
 
 def fake_decode_token(token):
     # this doesn't provide any security at all
