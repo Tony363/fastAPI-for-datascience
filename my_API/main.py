@@ -7,18 +7,16 @@ import xgboost as xgb
 import yfinance as yf
 import pandas as pd
 import numpy as np
-import arcade
 import os
 import math
 import time
 import socket
 import json
-
 import sys
 import struct
 import jwt
 from jwt import PyJWTError
-
+from datetime import datetime,timedelta
 from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, HTTPException, Query, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
@@ -65,6 +63,10 @@ class UserInDB(User):
 
 class TokenData(BaseModel):
     username: str = None
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 def verify_password(plain_password,hashed_password):
     return pwd_context.verify(plain_password,hashed_password)
@@ -166,11 +168,21 @@ async def read_data(data: payload, request:Request):
         print('data already processed')
         print(data_frame)
         raise HTTPException(status_code=404,detail='data already processed')
-    else:
-        data_frame['number'].append(data['number'][-1])
+
+    data_frame['number'].append(data['number'][-1])
+
+    try:
         data_frame['label1'].append(data['label1'][-1])
+    except IndexError:
+        data_frame['label1'].append('')
+  
+    try:
         data_frame['label2'].append(data['label2'][-1])
-        print(data_frame)
+    except IndexError:
+        data_frame['label2'].append('')
+
+
+    print(data_frame)
 
     return {'client_host':client_host,"data":data}
 
