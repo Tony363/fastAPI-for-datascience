@@ -22,10 +22,13 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from typing import Optional
 from passlib.context import CryptContext
-
 from sklearn.model_selection import train_test_split
 
 from secrets import *
+
+
+
+
 
 fake_users_db = {
     "johndoe": {
@@ -150,6 +153,9 @@ async def read_own_items(current_user: User = Depends(get_current_active_user)):
 
 ##############################################
 
+from sqlalchemy import create_engine
+
+engine = create_engine('sqlite:///mydb.db',echo=False)
 data_frame = {'number':[],'label1':[],'label2':[]}
 
 class payload(BaseModel):
@@ -181,10 +187,16 @@ async def read_data(data: payload, request:Request):
     except IndexError:
         data_frame['label2'].append('')
 
-
     print(data_frame)
+    df = pd.DataFrame(data_frame)
+    df.to_sql('csv',con=engine,if_exists='append',index_label='id')
 
     return {'client_host':client_host,"data":data}
+
+@app.get('/read_sql/')
+async def read_sql():
+    df = pd.read_sql('csv',con=engine)
+    print(df)
 
 @app.post("/feed_data/")
 async def feed_data(request:Request):  
