@@ -156,7 +156,7 @@ async def read_own_items(current_user: User = Depends(get_current_active_user)):
 from sqlalchemy import create_engine
 
 engine = create_engine('sqlite:///mydb.db',echo=False)
-data_frame = {'number':[],'label1':[],'label2':[]}
+
 
 class payload(BaseModel):
     number: list = None
@@ -167,36 +167,34 @@ class payload(BaseModel):
 
 @app.post("/data/")
 async def read_data(data: payload, request:Request):
+    data_frame = pd.DataFrame()
     client_host = request.client.host
     data = dict(data)
 
-    if data['number'][-1] in data_frame['number']:
+
+    if data['number'][-1] in [number for number in pd.read_sql("""SELECT number FROM csv""",con=engine).number]:
         print('data already processed')
-        print(data_frame)
+        print(pd.read_sql("SELECT * FROM csv",con=engine))
         raise HTTPException(status_code=404,detail='data already processed')
 
-    data_frame['number'].append(data['number'][-1])
-
     try:
-        data_frame['label1'].append(data['label1'][-1])
-    except IndexError:
-        data_frame['label1'].append('')
-  
-    try:
-        data_frame['label2'].append(data['label2'][-1])
-    except IndexError:
-        data_frame['label2'].append('')
+        data = pd.DataFrame(data)
+        print(data)
+    except Exception as e:
+        data = pd.DataFrame.from_dict(data,orient='index')
+        print(data)
+    data_frame = data_frame.append(data,ignore_index=True)
 
-    print(data_frame)
-    df = pd.DataFrame(data_frame)
-    df.to_sql('csv',con=engine,if_exists='append',index_label='id')
+   
+    data_frame.to_sql('csv',con=engine,if_exists='replace',index=False)
 
-    return {'client_host':client_host,"data":data}
+    return {'client_host':client_host,"data":data.to_dict()}
 
 @app.get('/read_sql/')
 async def read_sql():
     df = pd.read_sql('csv',con=engine)
     print(df)
+    return {'query':df.to_dict()}
 
 @app.post("/feed_data/")
 async def feed_data(request:Request):  
