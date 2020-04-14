@@ -170,22 +170,18 @@ async def read_data(data: payload, request:Request):
     data_frame = pd.DataFrame()
     client_host = request.client.host
     data = dict(data)
-
+    print(len(data['number']),len(data['label1']),len(data['label2']))
 
     if data['number'][-1] in [number for number in pd.read_sql("""SELECT number FROM csv""",con=engine).number]:
         print('data already processed')
         print(pd.read_sql("SELECT * FROM csv",con=engine))
         raise HTTPException(status_code=404,detail='data already processed')
-
-    try:
-        data = pd.DataFrame(data)
-        print(data)
-    except Exception as e:
-        data = pd.DataFrame.from_dict(data,orient='index')
-        print(data)
+ 
+    data = pd.DataFrame(data)
+    print(data)
+    
     data_frame = data_frame.append(data,ignore_index=True)
 
-   
     data_frame.to_sql('csv',con=engine,if_exists='replace',index=False)
 
     return {'client_host':client_host,"data":data.to_dict()}
