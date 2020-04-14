@@ -170,21 +170,24 @@ async def read_data(data: payload, request:Request):
     data_frame = pd.DataFrame()
     client_host = request.client.host
     data = dict(data)
-    print(len(data['number']),len(data['label1']),len(data['label2']))
 
-    if data['number'][-1] in [number for number in pd.read_sql("""SELECT number FROM csv""",con=engine).number]:
-        print('data already processed')
-        print(pd.read_sql("SELECT * FROM csv",con=engine))
-        raise HTTPException(status_code=404,detail='data already processed')
- 
-    data = pd.DataFrame(data)
-    print(data)
-    
-    data_frame = data_frame.append(data,ignore_index=True)
-
-    data_frame.to_sql('csv',con=engine,if_exists='replace',index=False)
-
-    return {'client_host':client_host,"data":data.to_dict()}
+    try:
+        if data['number'][0] in [number for number in pd.read_sql("""SELECT number FROM csv""",con=engine).number]:
+            print('data already processed')
+            print(pd.read_sql("SELECT * FROM csv",con=engine))
+            raise HTTPException(status_code=404,detail='data already processed')
+        prev_data = pd.read_sql("SELECT * FROM csv",con=engine)
+        data = pd.DataFrame(data)
+        prev_data = prev_data.append(data,ignore_index=True)
+        print(prev_data)
+        prev_data.to_sql('csv',con=engine,if_exists='replace',index=False)
+    except Exception as e:
+        print("need to create data base first")
+        data_frame = data_frame.append(pd.DataFrame(data))
+        data_frame.to_sql('csv',con=engine,if_exists='replace',index=False)
+        pass
+  
+    return {'client_host':client_host,"data":{}}
 
 @app.get('/read_sql/')
 async def read_sql():
@@ -194,7 +197,8 @@ async def read_sql():
 
 @app.post("/feed_data/")
 async def feed_data(request:Request):  
-    return data_frame
+    print(pd.read_sql("SELECT * FROM csv",con=engine).to_dict(orient='list'))
+    return {'data so far':pd.read_sql("SELECT * FROM csv",con=engine).to_dict(orient='list')}
 
 @app.get("/")
 async def root():
