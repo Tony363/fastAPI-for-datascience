@@ -153,9 +153,11 @@ async def read_own_items(current_user: User = Depends(get_current_active_user)):
 
 ##############################################
 
+
 from sqlalchemy import create_engine
 
 engine = create_engine('sqlite:///mydb.db',echo=False)
+db = pd.DataFrame({'number':[],'label1':[],'label2':[]}).to_sql('csv',con=engine,if_exists='fail',index=False)
 
 
 class payload(BaseModel):
@@ -170,24 +172,42 @@ async def read_data(data: payload, request:Request):
     data_frame = pd.DataFrame()
     client_host = request.client.host
     data = dict(data)
+    print(data)
 
-    try:
-        if data['number'][0] in [number for number in pd.read_sql("""SELECT number FROM csv""",con=engine).number]:
-            print('data already processed')
-            print(pd.read_sql("SELECT * FROM csv",con=engine))
-            raise HTTPException(status_code=404,detail='data already processed')
-        prev_data = pd.read_sql("SELECT * FROM csv",con=engine)
-        data = pd.DataFrame(data)
-        prev_data = prev_data.append(data,ignore_index=True)
-        print(prev_data)
-        prev_data.to_sql('csv',con=engine,if_exists='replace',index=False)
-    except Exception as e:
-        print("need to create data base first")
-        data_frame = data_frame.append(pd.DataFrame(data))
-        data_frame.to_sql('csv',con=engine,if_exists='replace',index=False)
-        pass
+    # try:
+    if data['number'][0] in [number for number in pd.read_sql("""SELECT number FROM csv""",con=engine).number]:
+        # print('data already processed') 
+        raise HTTPException(status_code=404,detail='data already processed')
+    
+    prev_data = pd.read_sql("SELECT * FROM csv",con=engine)
+    data = pd.DataFrame(data)
+    prev_data = prev_data.append(data,ignore_index=True)
+    print(prev_data)
+    prev_data.to_sql('csv',con=engine,if_exists='replace',index=False)
+    # except Exception as e:
+    #     print(f"{e}")
+    #     data_frame = data_frame.append(pd.DataFrame(data))
+    #     data_frame.to_sql('csv',con=engine,if_exists='replace',index=False)
+    #     pass
   
     return {'client_host':client_host,"data":{}}
+
+@app.post('/update/')
+async def update_data(data:payload,request:Request):
+    client_host = request.client.host
+    data = dict(data)
+    print(data)
+    current_table = pd.read_sql("""SELECT * FROM csv""",con=engine)
+    
+
+    current_table.loc[current_table.number == int(data['number'][0]),'label1'] = data['label1']
+    current_table.loc[current_table.number == int(data['number'][0]),'label2'] = data['label2']
+    print(current_table)
+    current_table.to_sql('csv',con=engine,if_exists='replace',index=False)
+
+    return {'client_host':client_host,'data':{}}
+
+
 
 @app.get('/read_sql/')
 async def read_sql():
