@@ -175,10 +175,11 @@ async def read_data(data: payload, request:Request):
     data_frame = pd.DataFrame()
     client_host = request.client.host
     data = dict(data)
-    print(data)
-
-    if data['number'][0] in [int(number) for number in pd.read_sql("""SELECT number FROM csv""",con=engine).number]:
-        print('data already processed') 
+    print(data['number'][0])
+    current_table = pd.read_sql("SELECT number FROM csv",con=engine)
+    print(current_table)
+    if data['number'][0] in [number for number in current_table.number]:
+        # print('data already processed') 
         raise HTTPException(status_code=404,detail='data already processed')
     
     prev_data = pd.read_sql("SELECT * FROM csv",con=engine)
@@ -193,14 +194,15 @@ async def read_data(data: payload, request:Request):
 async def update_data(data:payload,request:Request):
     client_host = request.client.host
     data = dict(data)
-
+    print(data)
+    
     current_table = pd.read_sql("""SELECT * FROM csv""",con=engine)
-   
-    current_table.at[int(data['number'][0]),'label1'] = data['label1']
-    current_table.at[int(data['number'][0]),'label2'] = data['label2']
-    # current_table.loc[current_table.number == int(data['number'][0]),'label1'] = data['label1']
-    # current_table.loc[current_table.number == int(data['number'][0]),'label2'] = data['label2']
-  
+    if data['number'][0] not in [number for number in current_table.number]:
+        raise HTTPException(status_code=404,detail='data not entered yet')
+
+    current_table.loc[current_table.number == int(data['number'][0]),'label1'] = data['label1']
+    current_table.loc[current_table.number == int(data['number'][0]),'label2'] = data['label2']
+    print(current_table)
     current_table.to_sql('csv',con=engine,if_exists='replace',index=False)
 
     return {'client_host':client_host,'data':{}}
