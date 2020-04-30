@@ -1,14 +1,32 @@
-import os,smtplib,schedule,time,datetime
+import os,smtplib,schedule,time,datetime, websocket
 import yfinance as yf
+from iexfinance.stocks import Stock
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from threading import Timer
 from secrets import *
 
 
+def on_message(ws,message):
+    print(message)
+
+def on_error(ws,error):
+    print(error)
+
+def on_close(ws):
+    print("### closed ###")
+
+def on_open(ws):
+    # ws.send('{"type":"subscribe","symbol":"AAPL"}')
+    # ws.send('{"type":"subscribe","symbol":"AMZN"}')
+    # ws.send('{"type":"subscribe","symbol":"BINANCE:BTCUSDT"}')
+    # ws.send('{"type":"subscribe","symbol":"IC MARKETS:1"}')
+    ws.send('{"type":"subscribe","symbol":"^DJI"}')
 
 def pairs_trading_algo():
     print('WTF')
+
+
     stock = 'DJI'
     sender_address = 'pythonemails333@gmail.com'
     sender_pass = input('please input password: ')
@@ -42,13 +60,25 @@ def pairs_trading_algo():
     print(done)
 
 if __name__ == "__main__":
+
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("wss://ws.finnhub.io?token=bql9nt7rh5rfdbi8mhm0",
+                                on_message=on_message,
+                                on_error=on_error,
+                                on_close=on_close)
+    
+    ws.on_open = on_open
+    ws.run_forever()
+
     stock = 'DJI'
   
     x = datetime.datetime.today()
-    y = x.replace(day=x.day+1, hour=17, minute=46, second=0, microsecond=0)
+    y = x.replace(day=x.day+1, hour=18, minute=30, second=0, microsecond=0)
     delta_t = y-x
 
     secs = delta_t.seconds+1
 
     t = Timer(secs, pairs_trading_algo)
     t.start()
+
+    
