@@ -3,3 +3,5 @@ Pipfile
 Pipfile.lock
 secrets.py
 __pycache__
+build
+dist

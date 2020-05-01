@@ -16,5 +16,5 @@ r = requests.post('https://finnhub.io/api/v1/webhook/delete?token=bql9nt7rh5rfdb
 res = r.json()
 print(res)
 
-r = requests.get('https://finnhub.io/api/v1/stock/candle?symbol=^DJI&resolution=1&from=1572651390&to=1572910590&token=bql9nt7rh5rfdbi8mhm0')
+r = requests.get('https://finnhub.io/api/v1/stock/candle?symbol=$DJI&resolution=1&from=1572651390&to=1572910590&token=bql9nt7rh5rfdbi8mhm0')
 print(r.json())
