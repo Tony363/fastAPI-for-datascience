@@ -1,7 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-import sys
 
-sys.setrecursionlimit(5000)
 block_cipher = None
 
 
@@ -9,7 +7,7 @@ a = Analysis(['emailauto_scrape.py'],
              pathex=['/home/tony/Desktop/My_repos/xgboostAPI'],
              binaries=[],
              datas=[],
-             hiddenimports=['selenium'],
+             hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],

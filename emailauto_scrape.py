@@ -1,11 +1,9 @@
 import os
 import smtplib 
-# import schedule
 import time
 import datetime
 import yfinance as yf
 import requests 
-# import chromedriver_binary
 import pkg_resources.py2_warn
 
 from bs4 import BeautifulSoup 
@@ -63,17 +61,15 @@ def original(
 
 
 if __name__ == "__main__":
-
     x = datetime.datetime.today()
-    try:
-        y = x.replace(day=x.day+1, hour=3, minute=20, second=0, microsecond=0)
-    except Exception as e:
-        y = x.replace(day=x.day, hour=24,minute=5,second=0,microsecond=0)
+
+    y = x.replace(day=x.day+1, hour=3, minute=20, second=0, microsecond=0)
+    
     delta_t = y-x
 
     secs = delta_t.seconds+1
 
-    t = Timer(secs, original())
+    t = Timer(secs, original)
     t.start()
 
     
