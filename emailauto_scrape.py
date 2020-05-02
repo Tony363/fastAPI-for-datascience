@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 from threading import Timer
 
 
-def original(
+def main(
     sender_address='pythonemails333@gmail.com',
     receiver_address = 'pysolver33@gmail.com',
     sender_pass = 'thefool363',
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 
     secs = delta_t.seconds+1
 
-    t = Timer(secs, original)
+    t = Timer(secs, main)
     t.start()
 
     
