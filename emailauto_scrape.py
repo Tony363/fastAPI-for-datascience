@@ -1,4 +1,5 @@
 import os
+import sms
 import smtplib 
 import time
 import datetime
@@ -18,7 +19,7 @@ def main(
     receiver_address = 'pysolver33@gmail.com',
     sender_pass = 'thefool363',
     ):
-    driver = webdriver.Chrome(executable_path='/usr/bin/chromedriver')
+    driver = webdriver.Chrome(executable_path='/home/tony/Desktop/My_repos/xgboostAPI/chromedriver_linux64 (1)/chromedriver')
     url = 'https://finance.yahoo.com/quote/%5EDJI/'
     driver.get(url)
     html = driver.execute_script('return document.body.innerHTML')
@@ -43,7 +44,11 @@ def main(
     if DJI_fl + 100 < DJI_latest.Close[-1]:
         mail_content = f'Dow Jones Index dropped by {DJI_latest.Close[-1] - DJI_fl}'
     else:
-        mail_content = "Dow Jones Index didn't drop drastically"
+        mail_content = f"""
+                Dow Jones Index didn't drop drastically. 
+                Index point absolute difference is {abs(DJI_latest.Close[-1] - DJI_fl)}.
+                Yesterday's DJI close was {DJI_latest.Close[-1]} and 
+                and what selenium just scrapped was {DJI_fl}"""
 
     message.attach(MIMEText(mail_content,'plain'))
 
@@ -63,7 +68,7 @@ def main(
 if __name__ == "__main__":
     x = datetime.datetime.today()
 
-    y = x.replace(day=x.day+1, hour=3, minute=20, second=0, microsecond=0)
+    y = x.replace(day=x.day+1, hour=13, minute=59, second=0, microsecond=0)
     
     delta_t = y-x
 

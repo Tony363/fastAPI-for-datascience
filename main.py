@@ -129,7 +129,7 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(fake_user_db, form_data.username,form_data.password)
+    user = authenticate_user(fake_users_db, form_data.username,form_data.password)
     if not user:
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -273,3 +273,39 @@ async def read_items(stock_id,token: str = Depends(oauth2_scheme)):
 
     return {"stock":stock_info,
             "history":history}
+
+
+############
+import alpaca_trade_api as tradeapi
+
+api_key = api_key
+api_secret = api_secret
+base_url = base_url
+
+@app.post("/alpaca/{stock_id_list}/{timeframe}")
+async def barrs(stock_id_list,timeframe,limit = 20):#token: str = Depends(oauth2_scheme)):
+    api = tradeapi.REST(api_key,api_secret,base_url,api_version='v2')
+    account = api.get_account()
+
+    stock_id_list = stock_id_list.replace(">","").split("<")
+    stock_id_list = [i.upper() for i in stock_id_list]
+
+    if len(stock_id_list[1:]) > int(limit):
+        return {"Query_Limit":"Exceeded Query Limit"}
+
+    data = dict()
+    for stock in stock_id_list[1:]:
+        print(stock)
+      
+        bar = api.get_barset(stock,timeframe,limit=2)
+        try:
+            STD = (bar[stock][1].c - bar[stock][0].c)/ bar[stock][1].c
+        except Exception as e:
+            # print(e)
+            return {"Query Error":"one of your queried stocks does not exist"}
+        data[stock] = dict()
+        data[stock]["ID"] = stock
+        data[stock]["SDT"] = STD
+        data[stock]["Price_Now"] = bar[stock][-1].c
+    # print(data)
+    return data

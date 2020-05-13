@@ -1,10 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 import sys
 
+
 sys.setrecursionlimit(5000)
 
 hiddenimports=['selenium','pandas']
-
 block_cipher = None
 
 
