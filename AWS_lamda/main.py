@@ -1,5 +1,5 @@
 import random
-import socket
+
 import sys
 import os
 import time
@@ -10,10 +10,10 @@ import numpy as np
 import os
 import math
 import time
-import socket
+
 import json
 import sys
-import struct
+# import struct
 import jwt
 from jwt import PyJWTError
 from datetime import datetime,timedelta
