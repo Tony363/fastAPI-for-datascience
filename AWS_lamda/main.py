@@ -294,18 +294,18 @@ async def barrs(stock_id_list,timeframe,limit = 20):#token: str = Depends(oauth2
         return {"Query_Limit":"Exceeded Query Limit"}
 
     data = dict()
-    for stock in stock_id_list[1:]:
-        print(stock)
-      
-        bar = api.get_barset(stock,timeframe,limit=2)
+    for stock in stock_id_list[1:]:      
         try:
+            bar = api.get_barset(stock,timeframe,limit=2)
             STD = (bar[stock][1].c - bar[stock][0].c)/ bar[stock][1].c
-        except Exception as e:
-            # print(e)
+        except IndexError as e:
             return {"Query Error":"one of your queried stocks does not exist"}
+        except Exception as e:
+            return {"Timeframe Error":{"please choose":{'minute','1Min','5Min','15Min','day','1D'}}}
+            
         data[stock] = dict()
         data[stock]["ID"] = stock
         data[stock]["SDT"] = STD
         data[stock]["Price_Now"] = bar[stock][-1].c
-    # print(data)
+
     return data

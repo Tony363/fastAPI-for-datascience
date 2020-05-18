@@ -8,7 +8,7 @@ certifi==2020.4.5.1
 cffi==1.14.0
 chardet==3.0.4
 cryptography==2.9.2
-dataclasses==0.7
+# dataclasses==0.7
 Deprecated==1.2.10
 fastapi==0.54.1
 idna==2.9
@@ -19,7 +19,7 @@ multidict==4.7.6
 multitasking==0.0.9
 numpy==1.18.4
 pandas==1.0.3
-pkg-resources==0.0.0
+# pkg-resources==0.0.0
 pycparser==2.20
 pydantic==1.5.1
 python-dateutil==2.8.1
