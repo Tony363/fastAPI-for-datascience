@@ -8,8 +8,8 @@ load_dotenv(dotenv_path=ENV_FILE_PATH)
 
 SECRET_KEY = os.getenv("tiingo_API_KEY")
 
-# print(os.path.dirname(os.path.abspath(__file__)))
-# print(os.path.abspath(__file__))
-# print(ROOT_DIR)
+print(os.path.dirname(os.path.abspath(__file__)))
+print(os.path.abspath(__file__))
+print(ROOT_DIR)
 print(ENV_FILE_PATH)
 
