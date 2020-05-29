@@ -50,6 +50,8 @@ def main(
                 Yesterday's DJI close was {DJI_latest.Close[-1]} and 
                 and what selenium just scrapped was {DJI_fl}"""
 
+    SMS = requests.post('https://g1shho6ped.execute-api.ap-northeast-1.amazonaws.com/Stage/stanksmessage/',data= {'stonks':mail_content})
+
     message.attach(MIMEText(mail_content,'plain'))
 
     session = smtplib.SMTP('smtp.gmail.com',587)
@@ -67,13 +69,9 @@ def main(
 
 if __name__ == "__main__":
     x = datetime.datetime.today()
-
-    y = x.replace(day=x.day+1, hour=13, minute=59, second=0, microsecond=0)
-    
+    y = x.replace(day=x.day+1, hour=22, minute=28, second=0, microsecond=0)
     delta_t = y-x
-
     secs = delta_t.seconds+1
-
     t = Timer(secs, main)
     t.start()
 
