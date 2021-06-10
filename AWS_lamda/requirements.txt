@@ -10,7 +10,7 @@ chardet==3.0.4
 cryptography==2.9.2
 # dataclasses==0.7
 Deprecated==1.2.10
-fastapi==0.54.1
+fastapi==0.65.2
 idna==2.9
 idna-ssl==1.1.0
 joblib==0.15.0
