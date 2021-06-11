@@ -35,7 +35,7 @@ threadpoolctl==2.0.0
 typing-extensions==3.7.4.2
 urllib3==1.24.3
 websocket-client==0.57.0
-websockets==8.1
+websockets==9.1
 wrapt==1.12.1
 xgboost==1.0.2
 yarl==1.4.2
