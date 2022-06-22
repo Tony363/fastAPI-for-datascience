@@ -17,7 +17,7 @@ joblib==0.15.0
 jwt==1.0.0
 multidict==4.7.6
 multitasking==0.0.9
-numpy==1.18.4
+numpy==1.22.0
 pandas==1.0.3
 # pkg-resources==0.0.0
 pycparser==2.20
